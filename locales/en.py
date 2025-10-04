@@ -1,4 +1,4 @@
-import uuid, string, secrets
+import uuid, string, secrets, random
 
 
 def random_string(length: int) -> str:
@@ -40,3 +40,5 @@ unch = "UntitledCharts by YumYummity"
 unch_chart_id_format = f"UnCh-{uuid.uuid4().hex}"
 
 # Next SEKAI
+ns = "Next Sekai by Burrito & qwewqa"
+ns_chart_id_format = f"coconut-next-sekai-{random.randint(1, 1000)}"
