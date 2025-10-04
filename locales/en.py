@@ -23,13 +23,17 @@ downloading = "- Downloading..."
 converting = "- Converting..."
 unknown_error = "Unknown error occurred."
 
+choose_instance = "Choose an instance"
+
+# Chart Cyanvas
+cc_all = "Chart Cyanvas (2 instances)"
+
 # Chart Cyanvas Archive
 cc = "Chart Cyanvas (Archive) by sevenc_nanashi"
 cc_chart_id_format = f"chcy-{random_string(28-5)}"
 
 # Chart Cyanvas Offshoot
 cc_o = "Chart Cyanvas by chart-cyanvas.com"
-cc_o_chart_id_format = f"chcy-{random_string(28-5)}"
 
 # UntitledCharts
 unch = "UntitledCharts by YumYummity"

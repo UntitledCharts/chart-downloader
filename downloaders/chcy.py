@@ -1,12 +1,21 @@
 from main import AnsiColors
 
 locale_keys = {
-    "name": "cc",
+    "name": "cc_all",
+    "name_archive": "cc",
+    "name_offshoot": "cc_o",
     "chart_id_format": "cc_chart_id_format",
     "chart_id_prompt": "chart_id",
     "invalid_chart_id": "invalid_chart_id",
+    "choose_instance": "choose_instance",
 }
 arguments = {
+    "instance": {
+        "required": True,
+        "prompt": "choose_instance",
+        "choices": ["chcy", "chcy-o"],
+        "choices_names": ["name_archive", "name_offshoot"],
+    },
     "chart_id": {
         "required": True,
         "prompt": ["chart_id_prompt", "chart_id_format"],
@@ -16,13 +25,13 @@ arguments = {
             "len(arg) == 28",
             "arg.removeprefix('chcy-').isalnum()",
         ],
-    }
+    },
 }
 
 from pathlib import Path
 
 
-def exporter(locale, out_path: Path, chart_id: str):
+def exporter(locale, out_path: Path, instance: str, chart_id: str):
     import json
     from sonolus_converters import usc, LevelData
     import requests
@@ -30,7 +39,9 @@ def exporter(locale, out_path: Path, chart_id: str):
     from helpers.file_type import detect_image, detect_audio
     import shutil
 
-    server_url = "https://cc.sevenc7c.com"
+    server_url = (
+        "https://cc.sevenc7c.com" if instance == "chcy" else "https://chart-cyanvas.com"
+    )
 
     print(AnsiColors.apply_foreground(locale.fetching, AnsiColors.BLUE))
     url = f"{server_url}/sonolus/levels/{chart_id}"
@@ -51,7 +62,8 @@ def exporter(locale, out_path: Path, chart_id: str):
     print(item["author"])
     del item["engine"]
 
-    level_out_path = out_path / chart_id
+    server_out_path = out_path / instance
+    level_out_path = server_out_path / chart_id
     level_out_path.mkdir(parents=True, exist_ok=True)
     shutil.rmtree(level_out_path)
     level_out_path.mkdir(parents=True, exist_ok=True)

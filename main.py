@@ -132,7 +132,10 @@ if __name__ == "__main__":
                     apply_locale_keys(prompt, locale_keys),
                     choices,
                     (
-                        [apply_locale_keys(choice) for choice in choices_names]
+                        [
+                            apply_locale_keys(choice, locale_keys)
+                            for choice in choices_names
+                        ]
                         if choices_names
                         else []
                     ),
@@ -192,7 +195,7 @@ if __name__ == "__main__":
         finished_arguments = {}
         for param, data in arguments.items():
             finished_arguments[param] = get_param(data, locale_keys)
-        out_path = Path("out") / server_answer
+        out_path = Path("out")
         try:
             resp = exporter(locale, out_path, **finished_arguments)
             if resp == True:
