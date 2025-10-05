@@ -19,7 +19,7 @@ class AnsiColors:
 
     @staticmethod
     def reset():
-        return f"\033[39m"
+        return "\033[39;49m"
 
     @staticmethod
     def apply_foreground(text, color_code):
@@ -34,80 +34,109 @@ class AnsiColors:
         return f"{AnsiColors.fg(fg_color_code)}{AnsiColors.bg(bg_color_code)}{text}{AnsiColors.reset()}"
 
 
+from locales.supported import SUPPORTED_LOCALES
+from locales import en
+from pathlib import Path
+
+locale = en
+
+
+def apply_locale_keys(loc: str | list, locale_keys: dict) -> str:
+    if type(loc) == str:
+        return eval(f"locale.{locale_keys[loc]}")
+    else:
+        loc_string = eval(f"locale.{locale_keys[loc[0]]}")
+        for i, key in enumerate(loc):
+            if i == 0:
+                continue
+            loc_string = loc_string.format(eval(f"locale.{locale_keys[key]}"))
+        return loc_string
+
+
+def ask(
+    prompt: str,
+    expected_answers: list,
+    expected_answer_names: list = [],
+    required: bool = True,
+    case_sensitive_choice_names: bool = False,
+) -> str | None:
+    def check_answer(
+        ans: str,
+        expected_ans: list,
+        choice_names: list,
+        case_sensitive_choice_names: bool,
+    ):
+        if ans in expected_ans:
+            return True
+        if case_sensitive_choice_names:
+            return ans in choice_names
+        else:
+            return ans.lower() in [choice.lower() for choice in choice_names]
+
+    expected_answers = list(expected_answers)
+    expected_answer_names = list(expected_answer_names)
+    if expected_answer_names:
+        if len(expected_answers) != len(expected_answer_names):
+            raise ValueError(
+                "Expected answer names list must be in same order and length as expected answers."
+            )
+    print(AnsiColors.apply_foreground(prompt, AnsiColors.CYAN))
+    for i, choice in enumerate(expected_answers):
+        if expected_answer_names:
+            print(
+                f"- {expected_answer_names[i]}",
+                AnsiColors.apply_foreground(f"({choice})", AnsiColors.GREEN),
+            )
+        else:
+            print(AnsiColors.apply_foreground(f"- {choice}", AnsiColors.GREEN))
+    print(
+        AnsiColors.apply_foreground(
+            locale.not_required if not required else locale.required, AnsiColors.YELLOW
+        )
+    )
+    answer = input("> " + AnsiColors.fg(AnsiColors.YELLOW))
+    print(AnsiColors.reset(), end=None)
+    if answer.strip() == "" and not required:
+        return None
+    while not check_answer(
+        answer, expected_answers, expected_answer_names, case_sensitive_choice_names
+    ):
+        print("-" * 50, "\n")
+        print(AnsiColors.apply(locale.invalid_choice, AnsiColors.RED, AnsiColors.BLACK))
+        print(AnsiColors.apply_foreground(prompt, AnsiColors.CYAN))
+        for i, choice in enumerate(expected_answers):
+            if expected_answer_names:
+                print(
+                    f"- {expected_answer_names[i]}",
+                    AnsiColors.apply_foreground(f"({choice})", AnsiColors.GREEN),
+                )
+            else:
+                print(AnsiColors.apply_foreground(f"- {choice}", AnsiColors.GREEN))
+        print(
+            AnsiColors.apply_foreground(
+                locale.not_required if not required else locale.required,
+                AnsiColors.YELLOW,
+            )
+        )
+        answer = input("> " + AnsiColors.fg(AnsiColors.YELLOW))
+        if answer.strip() == "" and not required:
+            return None
+        print(AnsiColors.reset(), end=None)
+    if (answer in expected_answer_names) and case_sensitive_choice_names:
+        answer_index = expected_answer_names.index(answer)
+        return expected_answers[answer_index]
+    elif (
+        answer.lower() in [choice.lower() for choice in expected_answer_names]
+    ) and not case_sensitive_choice_names:
+        answer_index = [choice.lower() for choice in expected_answer_names].index(
+            answer.lower()
+        )
+    return answer
+
+
 if __name__ == "__main__":
     try:
-        from locales.supported import SUPPORTED_LOCALES
         from downloaders.supported import SUPPORTED_DOWNLOADERS
-        from locales import en
-        from pathlib import Path
-
-        locale = en
-
-        def apply_locale_keys(loc: str | list, locale_keys: dict) -> str:
-            if type(loc) == str:
-                return eval(f"locale.{locale_keys[loc]}")
-            else:
-                loc_string = eval(f"locale.{locale_keys[loc[0]]}")
-                for i, key in enumerate(loc):
-                    if i == 0:
-                        continue
-                    loc_string = loc_string.format(eval(f"locale.{locale_keys[key]}"))
-                return loc_string
-
-        def ask(
-            prompt: str,
-            expected_answers: list,
-            expected_answer_names: list = [],
-            required: bool = True,
-        ) -> str | None:
-            expected_answers = list(expected_answers)
-            expected_answer_names = list(expected_answer_names)
-            if expected_answer_names:
-                if len(expected_answers) != len(expected_answer_names):
-                    raise ValueError(
-                        "Expected answer names list must be in same order and length as expected answers."
-                    )
-            print(AnsiColors.apply_foreground(prompt, AnsiColors.CYAN))
-            for i, choice in enumerate(expected_answers):
-                if expected_answer_names:
-                    print(
-                        f"- {expected_answer_names[i]}",
-                        AnsiColors.apply_foreground(f"({choice})", AnsiColors.GREEN),
-                    )
-                else:
-                    print(AnsiColors.apply_foreground(f"- {choice}", AnsiColors.GREEN))
-            answer = input("> " + AnsiColors.fg(AnsiColors.YELLOW))
-            print(AnsiColors.reset(), end=None)
-            if answer.strip() == "" and not required:
-                return None
-            while answer not in (expected_answers + expected_answer_names):
-                print("-" * 50, "\n")
-                print(
-                    AnsiColors.apply(
-                        locale.invalid_choice, AnsiColors.RED, AnsiColors.BLACK
-                    )
-                )
-                print(AnsiColors.apply_foreground(prompt, AnsiColors.CYAN))
-                for i, choice in enumerate(expected_answers):
-                    if expected_answer_names:
-                        print(
-                            f"- {expected_answer_names[i]}",
-                            AnsiColors.apply_foreground(
-                                f"({choice})", AnsiColors.GREEN
-                            ),
-                        )
-                    else:
-                        print(
-                            AnsiColors.apply_foreground(f"- {choice}", AnsiColors.GREEN)
-                        )
-                answer = input("> " + AnsiColors.fg(AnsiColors.YELLOW))
-                if answer.strip() == "" and not required:
-                    return None
-                print(AnsiColors.reset(), end=None)
-            if answer in expected_answer_names:
-                answer_index = expected_answer_names.index(answer)
-                return expected_answers[answer_index]
-            return answer
 
         def get_param(data: dict, locale_keys: dict):
             required = data.get("required", False)
@@ -116,6 +145,8 @@ if __name__ == "__main__":
             prompt = data["prompt"]
             invalid = data.get("invalid", None)
             validation = data.get("validate", [])
+            case_sensitive_choice_names = data.get("case_sensitive_choice_names", False)
+            choices_names_literal = data.get("choices_names_literal", False)
 
             def validate(arg: str, validation: list) -> bool:
                 try:
@@ -136,14 +167,25 @@ if __name__ == "__main__":
                             apply_locale_keys(choice, locale_keys)
                             for choice in choices_names
                         ]
-                        if choices_names
-                        else []
+                        if choices_names and not choices_names_literal
+                        else (
+                            choices_names
+                            if choices_names_literal and choices_names
+                            else []
+                        )
                     ),
                     required=required,
+                    case_sensitive_choice_names=case_sensitive_choice_names,
                 )
             print(
                 AnsiColors.apply_foreground(
                     apply_locale_keys(prompt, locale_keys), AnsiColors.CYAN
+                )
+            )
+            print(
+                AnsiColors.apply_foreground(
+                    locale.not_required if not required else locale.required,
+                    AnsiColors.YELLOW,
                 )
             )
             answer = input("> " + AnsiColors.fg(AnsiColors.YELLOW))
@@ -166,6 +208,12 @@ if __name__ == "__main__":
                 print(
                     AnsiColors.apply_foreground(
                         apply_locale_keys(prompt, locale_keys), AnsiColors.CYAN
+                    )
+                )
+                print(
+                    AnsiColors.apply_foreground(
+                        locale.not_required if not required else locale.required,
+                        AnsiColors.YELLOW,
                     )
                 )
                 answer = input("> " + AnsiColors.fg(AnsiColors.YELLOW))

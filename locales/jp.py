@@ -25,6 +25,17 @@ downloading = "- ダウンロード中..."
 converting = "- 変換中..."
 unknown_error = "原因不明のエラーが発生したよ。"
 
+ask_difficulty = "What difficulty?"
+
+auto = "自動検出"
+# regions
+ask_region = "どのサーバーリージョンを選択しますか？"
+en_region = "グローバル [HATSUNE MIKU: COLORFUL STAGE! feat. HATSUNE MIKU]"
+jp_region = "日本 [プロジェクトセカイ カラフルステージ! feat.初音ミク]"
+chinese_region = "中国 [初音未来：彩色舞台！feat. 初音未来]"
+korean_region = "韓国 [世界计划 彩色舞台 feat. 初音未来]"
+taiwan_region = "台湾 [世界計畫 繽紛舞台!feat. 初音未來]"
+
 choose_instance = "インスタンスを選んでね"
 
 # Chart Cyanvas
@@ -44,3 +55,9 @@ unch_chart_id_format = f"UnCh-{uuid.uuid4().hex}"
 # Next SEKAI
 ns = "Burrito & qwewqa の Next Sekai"
 ns_chart_id_format = f"coconut-next-sekai-{random.randint(1, 1000)}"
+
+# sekai.best
+sb = "sekai.best からの公式ゲーム譜面"
+sb_chart_id_format = str(random.randint(1, 550))
+# sb options
+sb_cover = "どの曲のカバーがいい？"
