@@ -1,3 +1,3 @@
-from locales import en
+from locales import en, jp
 
-SUPPORTED_LOCALES = {"en": en}
+SUPPORTED_LOCALES = {"en": en, "jp": jp}
