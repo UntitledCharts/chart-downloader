@@ -1,5 +1,5 @@
 # chart-downloader
-Download PJSK charts from Sonolus
+Download PJSK charts from Sonolus and sekai.best (official)
 
 # Outputs
 The output will always be an editor-compatible score file type.
