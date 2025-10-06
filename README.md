@@ -12,3 +12,10 @@ Here are the list of possible files:
 There are other types of LevelData, but they are not openable in editors.
 
 Additionally, the downloader will export the audio, jacket, and preview files for the level (if exists). We attempt to automatically determine the file type, however if there is no extension, we did not detect it.
+
+# Usage
+1. Install `Python >= 3.10` (Add to Path!)
+2. Install Git CLI (for installing requirements) https://cli.github.com/
+3. Install requirements `pip install -r requirements.txt` (to update: `pip install -U -r requirements.txt`)
+4. Run `main.py` (`python main.py`)
+5. Enjoy
