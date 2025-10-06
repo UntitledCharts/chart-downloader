@@ -39,15 +39,6 @@ def exporter(locale, out_path: Path, chart_id: str, region: str = "auto"):
     if region is None:
         region = "auto"
 
-    difficulty_map = {
-        "ez": "easy",
-        "norm": "normal",
-        "hard": "hard",
-        "ex": "expert",
-        "mas": "master",
-        "apd": "append",
-    }
-
     chart_id = int(chart_id)
 
     asset_paths = {
@@ -132,34 +123,12 @@ def exporter(locale, out_path: Path, chart_id: str, region: str = "auto"):
         difficulties_data = difficulties_data_resp.json()
     else:
         difficulties_data_resp.raise_for_status()
-        return locale.unknown_error
-
-    map_diff_to_short = {
-        "easy": "ez",
-        "normal": "norm",
-        "hard": "hard",
-        "expert": "ex",
-        "master": "mas",
-        "append": "apd",
-    }
-    map_diff_to_stylized = {
-        "easy": "Easy",
-        "normal": "Normal",
-        "hard": "Hard",
-        "expert": "Expert",
-        "master": "Master",
-        "append": "Append",
-    }
 
     all_difficulties = [
-        diff for diff in difficulties_data if diff.get("musicId") == chart_id
+        diff["musicDifficulty"]
+        for diff in difficulties_data
+        if diff.get("musicId") == chart_id
     ]
-    difficulty = ask(
-        apply_locale_keys("ask_difficulty", locale_keys),
-        [map_diff_to_short[diff["musicDifficulty"]] for diff in all_difficulties],
-        [map_diff_to_stylized[diff["musicDifficulty"]] for diff in all_difficulties],
-    )
-    difficulty = difficulty_map[difficulty]
 
     covers_url = db_paths[region].format(file="musicVocals")
     covers_data_resp = requests.get(covers_url)
@@ -212,10 +181,11 @@ def exporter(locale, out_path: Path, chart_id: str, region: str = "auto"):
     print(AnsiColors.apply_foreground(locale.downloading, AnsiColors.BLUE))
 
     print("Score...")
-    data_url = asset_paths["chart"].format(
-        region=region, id_4_zpad=str(chart_id).zfill(4), diff=difficulty
-    )
-    download_file(data_url, level_out_path / "score.sus")
+    for diff in all_difficulties:
+        data_url = asset_paths["chart"].format(
+            region=region, id_4_zpad=str(chart_id).zfill(4), diff=diff
+        )
+        download_file(data_url, level_out_path / f"{diff}.sus")
 
     print("Music...")
     bgm_url = asset_paths["music"].format(region=region, cover_name=cover_name)
