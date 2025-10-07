@@ -25,9 +25,7 @@ jobs:
           pip install nuitka
 
       - name: Build
-        env:
-            NUITKA_AUTO_DOWNLOAD: 1
-        run: python -m nuitka --onefile --standalone --python-flag=-OO --follow-imports --remove-output --lto=yes --no-pyi-file main.py
+        run: python -m nuitka --assume-yes-for-downloads --onefile --standalone --python-flag=-OO --follow-imports --remove-output --lto=yes --no-pyi-file main.py
 
       - name: Rename file
         run: rename main.exe ChartDownloader.exe
