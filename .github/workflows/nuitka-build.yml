@@ -50,3 +50,5 @@ jobs:
           asset_path: ./ChartDownloader.exe
           asset_name: ChartDownloader.exe
           asset_content_type: application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
