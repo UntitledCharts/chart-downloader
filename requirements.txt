@@ -1,2 +1,4 @@
 requests
 git+https://github.com/UntitledCharts/sonolus-level-converters
+git+https://github.com/UntitledCharts/pjsekai-background-gen-pillow-upd
+colorama

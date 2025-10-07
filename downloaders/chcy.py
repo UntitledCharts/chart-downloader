@@ -37,6 +37,7 @@ def exporter(locale, out_path: Path, instance: str, chart_id: str):
     import requests
     from helpers.file_downloader import download_file
     from helpers.file_type import detect_image, detect_audio
+    from helpers.backgrounds import generate_backgrounds
     import shutil
 
     server_url = (
@@ -121,6 +122,12 @@ def exporter(locale, out_path: Path, instance: str, chart_id: str):
         if ext != "unknown":
             new_path = jacket_path.with_suffix(f".{ext}")
             jacket_path.rename(new_path)
+            generate_backgrounds(new_path)
+        else:
+            try:
+                generate_backgrounds(jacket_path)
+            except:
+                pass
 
     print(AnsiColors.apply_foreground(locale.converting, AnsiColors.BLUE))
     with open(level_out_path / "ChCyLevelData.json.gz", "rb") as f:

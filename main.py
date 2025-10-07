@@ -34,6 +34,10 @@ class AnsiColors:
         return f"{AnsiColors.fg(fg_color_code)}{AnsiColors.bg(bg_color_code)}{text}{AnsiColors.reset()}"
 
 
+import colorama
+
+colorama.just_fix_windows_console()
+
 from locales.supported import SUPPORTED_LOCALES
 from locales import en
 from pathlib import Path
@@ -255,6 +259,7 @@ if __name__ == "__main__":
                 AnsiColors.apply(locale.unknown_error, AnsiColors.RED, AnsiColors.BLACK)
             )
             raise e
+        input()
     except Exception as e:
         print(AnsiColors.reset())
         raise e

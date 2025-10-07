@@ -35,6 +35,7 @@ def exporter(locale, out_path: Path, chart_id: str, region: str = "auto"):
     from helpers.file_downloader import download_file
     from helpers.file_type import detect_image, detect_audio
     import shutil
+    from helpers.backgrounds import generate_backgrounds
 
     if region is None:
         region = "auto"
@@ -201,4 +202,5 @@ def exporter(locale, out_path: Path, chart_id: str, region: str = "auto"):
     cover_url = asset_paths["jacket"].format(region=region, jacket_name=jacket_name)
     jacket_path = level_out_path / "jacket.png"
     download_file(cover_url, jacket_path)
+    generate_backgrounds(jacket_path)
     return True
