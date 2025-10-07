@@ -31,7 +31,7 @@ jobs:
 
       - name: Rename and zip file
         shell: pwsh
-        run:
+        run: |
             Rename-Item -Path main.exe -NewName ChartDownloader.exe
             Compress-Archive -Path ChartDownloader.exe -DestinationPath ChartDownloader.zip
 
