@@ -28,7 +28,8 @@ jobs:
         run: python -m nuitka --assume-yes-for-downloads --onefile --standalone --python-flag=-OO --follow-imports --remove-output --lto=yes --no-pyi-file main.py
 
       - name: Rename file
-        run: rename main.exe ChartDownloader.exe
+        shell: pwsh
+        run: Rename-Item -Path main.exe -NewName ChartDownloader.exe
 
       - name: Create GitHub Release
         id: create_release
