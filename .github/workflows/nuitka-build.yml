@@ -29,17 +29,19 @@ jobs:
       - name: Build
         run: python -m nuitka --assume-yes-for-downloads --onefile --standalone --python-flag=-OO --follow-imports --remove-output --lto=yes --no-pyi-file main.py
 
-      - name: Rename file
+      - name: Rename and zip file
         shell: pwsh
-        run: Rename-Item -Path main.exe -NewName ChartDownloader.exe
+        run:
+            Rename-Item -Path main.exe -NewName ChartDownloader.exe
+            Compress-Archive -Path ChartDownloader.exe -DestinationPath ChartDownloader.zip
 
       - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: ChartDownloader ${{ github.ref_name }}
-          body: "Release ${{ github.ref_name }}"
-          files: ./ChartDownloader.exe
+          body: "Release ${{ github.ref_name }} - Generated with Nuitka"
+          files: ./ChartDownloader.zip
           draft: true
           prerelease: false
         env:
