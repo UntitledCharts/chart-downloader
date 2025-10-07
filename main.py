@@ -135,6 +135,7 @@ def ask(
         answer_index = [choice.lower() for choice in expected_answer_names].index(
             answer.lower()
         )
+        return expected_answers[answer_index]
     return answer
 
 

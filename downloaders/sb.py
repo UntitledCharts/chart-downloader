@@ -139,14 +139,123 @@ def exporter(locale, out_path: Path, chart_id: str, region: str = "auto"):
         covers_data_resp.raise_for_status()
         return locale.unknown_error
 
+    game_chars_url = db_paths[region].format(file="gameCharacters")
+    game_chars_data_resp = requests.get(game_chars_url)
+    if game_chars_data_resp.status_code == 200:
+        game_chars_data = game_chars_data_resp.json()
+    else:
+        game_chars_data_resp.raise_for_status()
+        return locale.unknown_error
+
+    external_chars_url = db_paths[region].format(file="outsideCharacters")
+    external_chars_data_resp = requests.get(external_chars_url)
+    if external_chars_data_resp.status_code == 200:
+        external_chars_data = external_chars_data_resp.json()
+    else:
+        external_chars_data_resp.raise_for_status()
+        return locale.unknown_error
+
+    if region != "en":
+        en_game_chars_url = db_paths["en"].format(file="gameCharacters")
+        en_game_chars_data_resp = requests.get(en_game_chars_url)
+        if en_game_chars_data_resp.status_code == 200:
+            en_game_chars_data = en_game_chars_data_resp.json()
+        else:
+            en_game_chars_data_resp.raise_for_status()
+            return locale.unknown_error
+
+        en_external_chars_url = db_paths["en"].format(file="outsideCharacters")
+        en_external_chars_data_resp = requests.get(en_external_chars_url)
+        if en_external_chars_data_resp.status_code == 200:
+            en_external_chars_data = en_external_chars_data_resp.json()
+        else:
+            en_external_chars_data_resp.raise_for_status()
+            return locale.unknown_error
+
     all_covers = [cover for cover in covers_data if cover.get("musicId") == chart_id]
 
-    cover_id = ask(
+    def handle_cover(cover: str) -> str:
+        cover_caption = cover["caption"]
+        en_cover_caption = None
+        characters = cover["characters"]
+        character_names = []
+        en_character_names = [] if region != "en" else None
+        for character in characters:
+            charType = character["characterType"]
+            charId = character["characterId"]
+            # charType in ["game_character", "outside_character"]
+            if charType == "game_character":
+                char_data = next(
+                    char for char in game_chars_data if char["id"] == charId
+                )
+                # only EN needs to add space (open an issue if wrong!)
+                # Korean automatically adds the space in data.
+                # JP/CN/TW don't need space.
+                char_name = f"{char_data.get('firstName')}{' ' if region in ['en'] else ''}{char_data.get('givenName')}"
+                if region != "en":
+                    en_char_data = next(
+                        (char for char in en_game_chars_data if char["id"] == charId),
+                        None,
+                    )
+                    if en_char_data:
+                        en_char_name = f"{en_char_data.get('firstName')} {en_char_data.get('givenName')}"
+                        en_character_names.append(en_char_name)
+                    else:
+                        en_character_names.append(char_name)
+                character_names.append(char_name)
+            elif charType == "outside_character":
+                char_data = next(
+                    char for char in external_chars_data if char["id"] == charId
+                )
+                char_name = char_data["name"]
+                if region != "en":
+                    en_char_data = next(
+                        (
+                            char
+                            for char in en_external_chars_data
+                            if char["id"] == charId
+                        ),
+                        None,
+                    )
+                    if en_char_data:
+                        en_char_name = en_char_data["name"]
+                        en_character_names.append(en_char_name)
+                    else:
+                        en_character_names.append(char_name)
+            else:
+                print(f"WARN! character not game or external found: {character}")
+        en_cover_map = {
+            "vs_": "Virtual Singer ver.",
+            "se_": "Sekai ver.",
+            "an_": "Cover ver.",
+        }
+        for ab_key, en_cap in en_cover_map.items():
+            if cover["assetbundleName"].startswith(ab_key):
+                en_cover_caption = en_cap
+                break
+        if region == "en":
+            caption = cover_caption
+        else:
+            if en_cover_caption:
+                caption = f"{cover_caption} [{en_cover_caption}]"
+            else:
+                caption = cover_caption
+        return (
+            f"{caption}\n   - {', '.join(character_names).strip()}"
+            + (
+                f"\n   - {', '.join(en_character_names).strip()}"
+                if en_character_names
+                else ""
+            )
+            + "\n -->"
+        )
+
+    cover_index = ask(
         apply_locale_keys("cover", locale_keys),
-        [str(cover["id"]) for cover in all_covers],
-        [cover["caption"] for cover in all_covers],
+        [str(i) for i in range(1, len(all_covers) + 1)],
+        [handle_cover(cover) for cover in all_covers],
     )
-    cover = next(cover for cover in all_covers if cover["id"] == int(cover_id))
+    cover = all_covers[int(cover_index) - 1]
 
     possible_jacket_variants_url = db_paths[region].format(file="musicAssetVariants")
     possible_jacket_variants_resp = requests.get(possible_jacket_variants_url)
@@ -171,7 +280,11 @@ def exporter(locale, out_path: Path, chart_id: str, region: str = "auto"):
 
     cover_name = cover["assetbundleName"]
 
-    level_out_path = server_out_path / region / f"{chart_id}_{cover_id}"
+    level_out_path = (
+        server_out_path
+        / region
+        / f"{chart_id}_cover_{all_covers[int(cover_index)-1]['id']}"
+    )
     level_out_path.mkdir(parents=True, exist_ok=True)
     shutil.rmtree(level_out_path)
     level_out_path.mkdir(parents=True, exist_ok=True)
