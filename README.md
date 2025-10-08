@@ -1,5 +1,6 @@
 # chart-downloader
 [![Github All Releases](https://img.shields.io/github/downloads/UntitledCharts/chart-downloader/total.svg)]()
+
 Download PJSK charts from Sonolus and sekai.best (official)
 
 # Outputs
