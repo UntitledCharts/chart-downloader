@@ -26,8 +26,12 @@ jobs:
           pip install -r requirements.txt
           pip install nuitka
 
-      - name: Build
-        run: python -m nuitka --assume-yes-for-downloads --onefile --standalone --python-flag=-OO --follow-imports --remove-output --lto=yes --no-pyi-file main.py
+      - name: Build with Nuitka
+        shell: pwsh
+        run: |
+            $assets = python -c "import pjsk_background_gen_PIL, os; print(os.path.join(os.path.dirname(pjsk_background_gen_PIL.__file__), 'assets'))"
+            python -m nuitka --assume-yes-for-downloads --onefile --standalone --python-flag=-OO --follow-imports --remove-output --lto=yes --no-pyi-file "--include-data-dir=$assets=pjsk_background_gen_PIL/assets" main.py
+
 
       - name: Rename and zip file
         shell: pwsh
