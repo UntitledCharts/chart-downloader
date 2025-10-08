@@ -1,4 +1,5 @@
 # chart-downloader
+[![Github All Releases](https://img.shields.io/github/downloads/UntitledCharts/chart-downloader/total.svg)]()
 Download PJSK charts from Sonolus and sekai.best (official)
 
 # Outputs
@@ -15,7 +16,7 @@ Additionally, the downloader will export the audio, jacket, and preview files fo
 
 # Usage
 ### Releases
-Download `ChartDownloader.exe` from the [Latest Release](https://github.com/UntitledCharts/chart-downloader/releases/latest) and run it!
+Download `ChartDownloader.zip` from the [Latest Release](https://github.com/UntitledCharts/chart-downloader/releases/latest) and unzip it. Then, run it.
 ### Directly
 1. Install `Python >= 3.10` (Add to Path!)
 2. Install Git CLI (for installing requirements) https://cli.github.com/
