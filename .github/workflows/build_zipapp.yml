@@ -44,18 +44,12 @@ jobs:
         run: |
           "@echo off`napp.pyz" | Out-File -Encoding ASCII run.bat
 
-      - name: Assemble distribution
+      - name: Create release zip
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Path dist -Force
-          Copy-Item app.pyz dist\
-          Copy-Item run.bat dist\
-
-          cmd /c "robocopy venv dist\venv /E /XD __pycache__ .pytest_cache & exit /b 0"
-
-      - name: Zip distribution
-        shell: pwsh
-        run: Compress-Archive -Path dist\* -DestinationPath ChartDownloader.zip
+          Compress-Archive `
+            -Path venv,app.pyz,run.bat `
+            -DestinationPath ChartDownloader.zip
 
       - name: Publish Release
         uses: softprops/action-gh-release@v2
