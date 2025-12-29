@@ -29,9 +29,8 @@ jobs:
       - name: Install dependencies into embeddable Python
         shell: pwsh
         run: |
-          python-embed\python.exe -m ensurepip
-          python-embed\python.exe -m pip install --upgrade pip
-          python-embed\python.exe -m pip install -r requirements.txt --target python-embed/Lib/site-packages
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt --target python-embed/Lib/site-packages
 
       - name: Install zipapps (host Python)
         run: |
