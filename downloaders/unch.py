@@ -13,7 +13,7 @@ arguments = {
         "invalid": "invalid_chart_id",
         "validate": [
             "arg.startswith('UnCh-')",
-            "len(arg) > 37",
+            "len(arg) == 37",
             "arg.removeprefix('UnCh-').isalnum()",
         ],
     },
