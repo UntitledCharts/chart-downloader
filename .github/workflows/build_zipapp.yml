@@ -15,6 +15,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Prepend site-packages loader to main.py
+        shell: pwsh
+        run: |
+          $file = "main.py"
+          $lines = @(
+            "import sys",
+            "import pathlib",
+            "",
+            "here = pathlib.Path(__file__).parent",
+            "sys.path.insert(0, str(here / 'site-packages'))",
+            ""
+          )
+          $content = Get-Content $file
+          $lines + $content | Set-Content $file
+
       - name: Setup host Python
         uses: actions/setup-python@v6
         with:
