@@ -50,7 +50,9 @@ jobs:
           New-Item -ItemType Directory -Path dist -Force
           Copy-Item app.pyz dist\
           Copy-Item run.bat dist\
+
           robocopy venv dist\venv /E /XD __pycache__ .pytest_cache
+          if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
 
       - name: Zip distribution
         shell: pwsh
