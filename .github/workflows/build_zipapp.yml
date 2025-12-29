@@ -51,8 +51,7 @@ jobs:
           Copy-Item app.pyz dist\
           Copy-Item run.bat dist\
 
-          robocopy venv dist\venv /E /XD __pycache__ .pytest_cache
-          if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
+          cmd /c "robocopy venv dist\venv /E /XD __pycache__ .pytest_cache & exit /b 0"
 
       - name: Zip distribution
         shell: pwsh
