@@ -139,7 +139,7 @@ def ask(
     return answer
 
 
-if __name__ == "__main__":
+def main():
     try:
         from downloaders.supported import SUPPORTED_DOWNLOADERS
 
@@ -267,3 +267,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt as e:
         print(AnsiColors.reset())
         raise e
+
+
+if __name__ == "__main__":
+    main()
