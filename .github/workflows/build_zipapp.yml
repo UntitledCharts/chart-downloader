@@ -8,47 +8,49 @@ on:
 jobs:
   build:
     permissions:
-        packages: write
-        contents: write
+      packages: write
+      contents: write
     runs-on: windows-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Setup host Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
-      - name: Create runtime virtual environment
-        run: |
-          python -m venv venv
-
-      - name: Install runtime dependencies into venv
+      - name: Download Python embeddable
         shell: pwsh
         run: |
-          venv\Scripts\python -m pip install --upgrade pip
-          venv\Scripts\python -m pip install -r requirements.txt
+          Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip -OutFile python-embed.zip
+          Expand-Archive python-embed.zip python-embed
+
+      - name: Install dependencies into embeddable Python
+        shell: pwsh
+        run: |
+          python-embed\python.exe -m ensurepip
+          python-embed\python.exe -m pip install --upgrade pip
+          python-embed\python.exe -m pip install -r requirements.txt --target python-embed/Lib/site-packages
 
       - name: Install zipapps (host Python)
         run: |
           python -m pip install --upgrade pip zipapps
 
-
       - name: Build zipapp
         shell: pwsh
-        run: python -m zipapps -c -a main.py,locales,helpers,downloaders -o app.pyz -d -m main:main -p venv/Scripts/python
+        run: python -m zipapps -c -a main.py,locales,helpers,downloaders -o app.pyz -d -m main:main
 
       - name: Generate run.bat
         shell: pwsh
         run: |
-          "@echo off`napp.pyz" | Out-File -Encoding ASCII run.bat
+          "@echo off`npython-embed\python.exe app.pyz" | Out-File -Encoding ASCII run.bat
 
       - name: Create release zip
         shell: pwsh
         run: |
           Compress-Archive `
-            -Path venv,app.pyz,run.bat `
+            -Path python-embed,app.pyz,run.bat `
             -DestinationPath ChartDownloader.zip
 
       - name: Publish Release
