@@ -3,8 +3,6 @@
 
 Download PJSK charts from Sonolus and sekai.best (official)
 
-**You can download PJSK Score Maker custom charts with this project (using a guest account): https://github.com/UnknownSekai/score-manager**
-
 # Outputs
 The output will always be an editor-compatible score file type.
 
