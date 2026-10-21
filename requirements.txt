@@ -1,4 +1,3 @@
 requests
-rg-converters
 git+https://github.com/UntitledCharts/pjsekai-background-gen-pillow-upd
 colorama

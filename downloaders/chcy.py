@@ -33,7 +33,6 @@ from pathlib import Path
 
 def exporter(locale, out_path: Path, instance: str, chart_id: str):
     import json
-    from rg_converters.converters import usc, LevelData
     import requests
     from helpers.file_downloader import download_file
     from helpers.file_type import detect_image, detect_audio
@@ -129,8 +128,4 @@ def exporter(locale, out_path: Path, instance: str, chart_id: str):
             except:
                 pass
 
-    print(AnsiColors.apply_foreground(locale.converting, AnsiColors.BLUE))
-    with open(level_out_path / "ChCyLevelData.json.gz", "rb") as f:
-        score = LevelData.chart_cyanvas.load(f)
-    usc.export(level_out_path / "score.usc", score)
     return True
