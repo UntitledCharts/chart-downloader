@@ -33,7 +33,7 @@ from pathlib import Path
 
 def exporter(locale, out_path: Path, instance: str, chart_id: str):
     import json
-    from sonolus_converters import usc, LevelData
+    from rg_converters.converters import usc, LevelData
     import requests
     from helpers.file_downloader import download_file
     from helpers.file_type import detect_image, detect_audio
